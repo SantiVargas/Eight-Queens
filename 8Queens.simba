@@ -1,0 +1,160 @@
+program Queens;
+
+Type
+  T3DIntegerArray = Array of T2DIntegerArray;
+
+var
+  Board: T3DIntegerArray;
+  Timer: Integer;
+
+Function NullPoint: TPoint;
+
+begin
+  Result := Point(-1,-1);
+end;
+
+Function FullBoard: T2DIntegerArray;
+
+var
+  x,y: Integer;
+
+begin
+  for x := 0 to 7 do
+    for y := 0 to 7 do
+    begin
+      SetLength(Result, x + 1);
+      SetLength(Result[x], y + 1);
+      Result[x][y] := 0;
+    end;
+end;
+
+Function ColumnRowCheck(var TheBoard: T2DIntegerArray): Boolean;
+
+var
+  x, y, x2, y2, i: integer;
+
+begin
+  Result := True;
+
+  for x := 0 to 7 do
+    for y := 0 to 7 do
+    begin
+      //Writeln('(' + tostr(x) + ',' + tostr(y) + ')');
+      if TheBoard[x][y] = 1 then
+      begin
+        //Hold These Values
+        y2 := y;
+        x2 := x;
+
+        //Check Row
+        for i := x to x do
+          for y := 0 to 7 do
+          begin
+            //Writeln(tostr(BoardA[i][y]));
+            //if (TheBoard[i][y] = 1) and (not((i = x) and (y = y2))) then
+
+            if TheBoard[i][y] = 0 then
+              TheBoard[i][y] := -1;
+          end;
+
+        //Reinstate Original Y value
+        y := y2;
+
+        //Check Column
+        for x := 0 to 7 do
+          if TheBoard[x][y] = 0 then
+            TheBoard[x][y] := -1;
+
+        //Reinstate Original X value
+        x := x2;
+      end;
+    end;
+end;
+
+Procedure DiagonalCheck(var TheBoard: T2DIntegerArray);
+
+var
+  x, y, x2, y2, i, i2: integer;
+
+begin
+  for x := 0 to 7 do
+    for y := 0 to 7 do
+    begin
+      //Writeln('(' + tostr(x) + ',' + tostr(y) + ')');
+      if TheBoard[x][y] = 1 then
+      begin
+        //Hold These Values
+        y2 := y;
+        x2 := x;
+
+        while (not ((x = 7) or (y = 7))) do
+        begin
+          Inc(x);
+          Inc(y);
+          TheBoard[x][y] := -1;
+        end;
+
+        //Reinstate Values
+        y := y2;
+        x := x2;
+
+        while (not ((x = 0) or (y = 0))) do
+        begin
+          Dec(x);
+          Dec(y);
+          TheBoard[x][y] := -1;
+        end;
+
+        //Reinstate Values
+        y := y2;
+        x := x2;
+
+        while (not ((x = 7) or (y = 0))) do
+        begin
+          Inc(x);
+          Dec(y);
+          TheBoard[x][y] := -1;
+        end;
+
+        //Reinstate Values
+        y := y2;
+        x := x2;
+
+        while (not ((x = 0) or (y = 7))) do
+        begin
+          Dec(x);
+          Inc(y);
+          TheBoard[x][y] := -1;
+        end;
+
+        //Reinstate Values
+        y := y2;
+        x := x2;
+      end;
+    end;
+end;
+
+Procedure Main;
+
+var
+  BoardA: T2DIntegerArray;
+  x, y: integer;
+
+begin
+  BoardA := FullBoard;
+  for x := 0 to 0 do
+    for y := 0 to 0 do
+    begin
+      BoardA[x][y] := 1;
+      ColumnRowCheck(BoardA);
+      DiagonalCheck(BoardA);
+      Writeln(ToStr(BoardA));
+    end;
+end;
+
+begin
+  Timer := GetSystemTime;
+  FullBoard;
+  Main;
+  Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+end.
