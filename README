@@ -1,6 +1,7 @@
 This project is titled Eight Queens.
 
-More information about the general concept can be found here: ---http://en.wikipedia.org/wiki/Eight_queens_puzzle
+More information about the general concept can be found here: 
+---http://en.wikipedia.org/wiki/Eight_queens_puzzle
 
 In order to open this type of file, you would need the open source program, SIMBA.
 It can be found here:
@@ -9,4 +10,7 @@ The source:
 ---https://github.com/MerlijnWajer/Simba
 
 The language this file is written in is called PascalScript.
+
+Credits:
+Thanks to Dgby714 --- He suggested the CopyArray Functions due to problem in PascalScript with pointers and arrays.
 
