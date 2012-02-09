@@ -74,7 +74,7 @@ end;
 Procedure DiagonalCheck(var TheBoard: T2DIntegerArray);
 
 var
-  x, y, x2, y2, i, i2: integer;
+  x, y, x2, y2: integer;
 
 begin
   for x := 0 to 7 do
@@ -134,25 +134,82 @@ begin
     end;
 end;
 
+Function AvailableMove(TheBoard: T2DIntegerArray): boolean;
+
+var
+  x,y: Integer;
+
+begin
+  Result := False;
+  for x := 0 to 7 do
+    for y := 0 to 7 do
+    begin
+      Result := (TheBoard[x][y] = 0);
+      if Result then
+        Exit;
+    end;
+end;
+
+procedure CopyIntArr(const Src: TIntegerArray; out Dest: TIntegerArray);
+var
+  I, H: LongInt;
+begin
+  H := Length(Src);
+  SetLength(Dest, H);
+  Dec(H);
+  for I := 0 to H do
+    Dest[I] := Src[I];
+end;
+
+procedure Copy2DIntArr(const Src: T2DIntegerArray; out Dest: T2DIntegerArray);
+var
+  I, H: LongInt;
+begin
+  H := Length(Src);
+  SetLength(Dest, H);
+  Dec(H);
+  for I := 0 to H do
+    CopyIntArr(Src[I], Dest[I]);
+end;
+
 Procedure Main;
 
 var
   BoardA: T2DIntegerArray;
-  x, y: integer;
+  BArray: T3DIntegerArray;
+  x, y, x2, y2, index: integer;
 
 begin
-  BoardA := FullBoard;
   for x := 0 to 0 do
     for y := 0 to 0 do
     begin
+      SetLength(BArray, 1);
+      BoardA := FullBoard;
       BoardA[x][y] := 1;
       ColumnRowCheck(BoardA);
       DiagonalCheck(BoardA);
-      Writeln(ToStr(BoardA));
+      for x2 := 0 to 7 do
+        for y2 := 0 to 7 do
+        begin
+          //Writeln('(' + tostr(x2) + ',' + tostr(y2) + ')');
+          if BoardA[x2][y2] = 0 then
+          begin
+            Setlength(BArray, Length(BArray) + 1);
+            index := High(BArray);
+            Copy2DIntArr(BoardA, BArray[index]);
+            BArray[index][x2][y2] := 1;
+            ColumnRowCheck(BArray[index]);
+            DiagonalCheck(BArray[index]);
+            Writeln(ToStr(BArray[index]));
+            Wait(2000);
+          end;
+        end;
+      //Writeln(ToStr(BoardA));
     end;
 end;
 
 begin
+  ClearDebug;
   Timer := GetSystemTime;
   FullBoard;
   Main;
