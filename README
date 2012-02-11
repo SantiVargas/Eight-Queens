@@ -3,7 +3,8 @@ This project is titled Eight Queens.
 More information about the general concept can be found here: 
 ---http://en.wikipedia.org/wiki/Eight_queens_puzzle
 
-In order to open this type of file, you would need the open source program, SIMBA.
+In order to open this type of file, you would need the open source program, SIMBA, which acts as the compiler.
+
 It can be found here:
 ---http://wizzup.org/#simba
 The source:
