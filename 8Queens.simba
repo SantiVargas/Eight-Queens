@@ -2,9 +2,9 @@ program Queens;
 
 Type
   T3DIntegerArray = Array of T2DIntegerArray;
+  T4DIntegerArray = Array of T3DIntegerArray;
 
 var
-  Board: T3DIntegerArray;
   Timer: Integer;
 
 Function NullPoint: TPoint;
@@ -134,17 +134,23 @@ begin
     end;
 end;
 
-Function AvailableMove(TheBoard: T2DIntegerArray): boolean;
+Function AvailableMoves(TheBoard: T2DIntegerArray; Max: Integer): boolean;
 
 var
-  x,y: Integer;
+  x,y, I: Integer;
 
 begin
   Result := False;
+  I := 0;
   for x := 0 to 7 do
     for y := 0 to 7 do
     begin
-      Result := (TheBoard[x][y] = 0);
+      if TheBoard[x][y] = 0 then
+        if Max = 0 then
+          Exit
+        else
+          Inc(I);
+      Result := (I >= Max);
       if Result then
         Exit;
     end;
@@ -172,46 +178,89 @@ begin
     CopyIntArr(Src[I], Dest[I]);
 end;
 
+procedure Copy3DIntArr(const Src: T3DIntegerArray; out Dest: T3DIntegerArray);
+var
+  I, H: LongInt;
+begin
+  H := Length(Src);
+  SetLength(Dest, H);
+  Dec(H);
+  for I := 0 to H do
+    Copy2DIntArr(Src[I], Dest[I]);
+end;
+
 Procedure Main;
 
 var
   VarX, VarY: TIntegerArray;
-  BoardA: T2DIntegerArray;
+  Board: T2DIntegerArray;
   BArray: T3DIntegerArray;
-  Index, Queen: integer;
+  B2DArray: T4DIntegerArray;
+  Index, Queen, I: integer;
 
 begin
-  SetLength(VarX, 2);
-  SetLength(VarY, 2);
-  for Queen := 0 to 1 do
+  SetLength(VarX, 3);
+  SetLength(VarY, 3);
+  for Queen := 0 to 2 do
   case Queen of
     0:
-    for VarX[Queen] := 0 to 0 do
-      for VarY[Queen] := 0 to 0 do
-      begin
-        BoardA := FullBoard;
-        BoardA[VarX[Queen]][VarY[Queen]] := 1;
-        ColumnRowCheck(BoardA);
-        DiagonalCheck(BoardA);
-      end;
+    begin
+      Writeln('Queen ' + ToStr(Queen));
+      for VarX[Queen] := 0 to 0 do
+        for VarY[Queen] := 0 to 0 do
+        begin
+          Board := FullBoard;
+          Board[VarX[Queen]][VarY[Queen]] := 1;
+          ColumnRowCheck(Board);
+          DiagonalCheck(Board);
+        end;
+      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+    end;
 
     1:
-    for VarX[Queen] := 0 to 7 do
-      for VarY[Queen] := 0 to 7 do
-      begin
-        //Writeln('(' + tostr(x2) + ',' + tostr(y2) + ')');
-        if BoardA[VarX[Queen]][VarY[Queen]] = 0 then
+    begin
+      Writeln('Queen ' + ToStr(Queen));
+      for VarX[Queen] := 0 to 7 do
+        for VarY[Queen] := 0 to 7 do
         begin
-          Setlength(BArray, Length(BArray) + 1);
-          index := High(BArray);
-          Copy2DIntArr(BoardA, BArray[index]);
-          BArray[index][VarX[Queen]][VarY[Queen]] := 1;
-          ColumnRowCheck(BArray[index]);
-          DiagonalCheck(BArray[index]);
-          //Writeln(ToStr(BArray[index]));
-          //Writeln(tostr(index));
+          //Writeln('(' + tostr(VarX[Queen]) + ',' + tostr(VarY[Queen]) + ')');
+          if Board[VarX[Queen]][VarY[Queen]] = 0 then
+          begin
+            Setlength(BArray, Length(BArray) + 1);
+            index := High(BArray);
+            Copy2DIntArr(Board, BArray[index]);
+            BArray[index][VarX[Queen]][VarY[Queen]] := 1;
+            ColumnRowCheck(BArray[index]);
+            DiagonalCheck(BArray[index]);
+            //Writeln(ToStr(BArray[index]));
+            //Writeln(tostr(index));
+          end;
         end;
-      end;
+      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+    end;
+
+    2:
+    begin
+      Writeln('Queen ' + ToStr(Queen));
+      for I := 0 to High(BArray) do
+        for VarX[Queen] := 0 to 7 do
+          for VarY[Queen] := 0 to 7 do
+          begin
+            //Writeln('(' + tostr(VarX[Queen]) + ',' + tostr(VarY[Queen]) + ')');
+            if BArray[I][VarX[Queen]][VarY[Queen]] = 0 then
+            begin
+              Setlength(B2DArray, Length(B2DArray) + 1);
+              Index := High(B2DArray);
+              Copy3DIntArr(BArray, B2DArray[Index]);
+              B2DArray[Index][I][VarX[Queen]][VarY[Queen]] := 1;
+              ColumnRowCheck(B2DArray[Index][I]);
+              DiagonalCheck(B2DArray[Index][I]);
+              //Writeln(ToStr(BArray[index]));
+              //Writeln(tostr(index));
+            end;
+          end;
+    //Writeln(tostr(B2DArray));
+    end;
     //Writeln(ToStr(BoardA));
   end;
 end;
