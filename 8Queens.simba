@@ -7,153 +7,94 @@ Type
 var
   Timer: Integer;
 
-Function NullPoint: TPoint;
-
-begin
-  Result := Point(-1,-1);
-end;
-
-Function FullBoard: T2DIntegerArray;
+Procedure ColumnRowCheck(var TheBoard: TIntegerArray);
 
 var
-  x,y: Integer;
+  x, i: integer;
 
 begin
-  for x := 0 to 7 do
-    for y := 0 to 7 do
+  for x := 0 to 63 do
+  if TheBoard[x] = 1 then
+  begin
+    i := x;
+
+    // Check Row Up
+    repeat
+      Inc(I);
+      if I < 64 then
+        TheBoard[i] := -1;
+    until (I >= 64) or ((I mod 8) = 7);
+
+    i := x;
+
+    // Check Row Down
+    repeat
+      Dec(I);
+      if I > -1 then
+        TheBoard[i] := -1;
+    until (I <= 0) or ((I mod 8) = 0);
+
+    i := x;
+
+    //Check Column
+    while (i > 7) do
+      DecEx(I, 8);
+
+    while I < 64 do
     begin
-      SetLength(Result, x + 1);
-      SetLength(Result[x], y + 1);
-      Result[x][y] := 0;
+      if (I <> x) then
+        TheBoard[i] := -1;
+      IncEx(I, 8);
     end;
+  end;
 end;
 
-Function ColumnRowCheck(var TheBoard: T2DIntegerArray): Boolean;
+Procedure DiagonalCheck(var TheBoard: TIntegerArray);
 
 var
-  x, y, x2, y2, i: integer;
+  x, i: integer;
 
 begin
-  Result := True;
+  for x := 0 to 63 do
+  if TheBoard[x] = 1 then
+  begin
+    i := x;
 
-  for x := 0 to 7 do
-    for y := 0 to 7 do
+    // Up, Right
+    repeat
+      IncEx(I, 9);
+      if I < 64 then
+        TheBoard[i] := -1;
+    until (I >= 64) or ((I mod 8) = 7);
+
+    i := x;
+
+    // Down, Left
+    repeat
+      DecEx(I, 9);
+      if I > -1 then
+        TheBoard[i] := -1;
+    until (I <= 0) or ((I mod 8) = 0);
+
+    i := x;
+
+    // Up, Left
+    while (not ((I mod 8) = 0)) and (I < 64) do
     begin
-      //Writeln('(' + tostr(x) + ',' + tostr(y) + ')');
-      if TheBoard[x][y] = 1 then
-      begin
-        //Hold These Values
-        y2 := y;
-        x2 := x;
-
-        //Check Row
-        for i := x to x do
-          for y := 0 to 7 do
-          begin
-            //Writeln(tostr(BoardA[i][y]));
-            //if (TheBoard[i][y] = 1) and (not((i = x) and (y = y2))) then
-
-            if TheBoard[i][y] = 0 then
-              TheBoard[i][y] := -1;
-          end;
-
-        //Reinstate Original Y value
-        y := y2;
-
-        //Check Column
-        for x := 0 to 7 do
-          if TheBoard[x][y] = 0 then
-            TheBoard[x][y] := -1;
-
-        //Reinstate Original X value
-        x := x2;
-      end;
+      IncEx(I, 7);
+      if I < 63 then
+        TheBoard[i] := -1;
     end;
-end;
 
-Procedure DiagonalCheck(var TheBoard: T2DIntegerArray);
+    i := x;
 
-var
-  x, y, x2, y2: integer;
-
-begin
-  for x := 0 to 7 do
-    for y := 0 to 7 do
-    begin
-      //Writeln('(' + tostr(x) + ',' + tostr(y) + ')');
-      if TheBoard[x][y] = 1 then
-      begin
-        //Hold These Values
-        y2 := y;
-        x2 := x;
-
-        while (not ((x = 7) or (y = 7))) do
-        begin
-          Inc(x);
-          Inc(y);
-          TheBoard[x][y] := -1;
-        end;
-
-        //Reinstate Values
-        y := y2;
-        x := x2;
-
-        while (not ((x = 0) or (y = 0))) do
-        begin
-          Dec(x);
-          Dec(y);
-          TheBoard[x][y] := -1;
-        end;
-
-        //Reinstate Values
-        y := y2;
-        x := x2;
-
-        while (not ((x = 7) or (y = 0))) do
-        begin
-          Inc(x);
-          Dec(y);
-          TheBoard[x][y] := -1;
-        end;
-
-        //Reinstate Values
-        y := y2;
-        x := x2;
-
-        while (not ((x = 0) or (y = 7))) do
-        begin
-          Dec(x);
-          Inc(y);
-          TheBoard[x][y] := -1;
-        end;
-
-        //Reinstate Values
-        y := y2;
-        x := x2;
-      end;
-    end;
-end;
-
-Function AvailableMoves(TheBoard: T2DIntegerArray; Max: Integer): boolean;
-
-var
-  x,y, I: Integer;
-
-begin
-  Result := False;
-  I := 0;
-  for x := 0 to 7 do
-    for y := 0 to 7 do
-    begin
-      if TheBoard[x][y] = 0 then
-        if Max = 0 then
-          Exit
-        else
-          Inc(I);
-      Result := (I >= Max);
-      if Result then
-        Exit;
-    end;
+    // Down, Right
+    repeat
+      DecEx(I, 9);
+      if I > -1 then
+        TheBoard[i] := -1;
+    until (I <= 0) or ((I mod 8) = 7);
+  end;
 end;
 
 procedure CopyIntArr(const Src: TIntegerArray; out Dest: TIntegerArray);
@@ -192,50 +133,41 @@ end;
 Procedure Main;
 
 var
-  VarX, VarY: TIntegerArray;
-  Board: T2DIntegerArray;
-  BArray: T3DIntegerArray;
-  B2DArray: T4DIntegerArray;
-  Index, Queen, I: integer;
+  Board: TIntegerArray;
+  BArray: T2DIntegerArray;
+  B2DArray: T3DIntegerArray;
+  B3DArray: T4DIntegerArray;
+  Index, Queen, X, I, I2: integer;
 
 begin
-  SetLength(VarX, 3);
-  SetLength(VarY, 3);
-  for Queen := 0 to 2 do
+  for Queen := 0 to 3 do
   case Queen of
     0:
     begin
       Writeln('Queen ' + ToStr(Queen));
-      for VarX[Queen] := 0 to 0 do
-        for VarY[Queen] := 0 to 0 do
-        begin
-          Board := FullBoard;
-          Board[VarX[Queen]][VarY[Queen]] := 1;
-          ColumnRowCheck(Board);
-          DiagonalCheck(Board);
-        end;
+      for x := 0 to 0 do //Only working on (0,0) for now.
+      begin
+        SetLength(Board, 64);
+        Board[x] := 1;
+        ColumnRowCheck(Board);
+        DiagonalCheck(Board);
+      end;
       Writeln(ToStr(GetSystemTime - Timer) + 'ms');
     end;
 
     1:
     begin
       Writeln('Queen ' + ToStr(Queen));
-      for VarX[Queen] := 0 to 7 do
-        for VarY[Queen] := 0 to 7 do
-        begin
-          //Writeln('(' + tostr(VarX[Queen]) + ',' + tostr(VarY[Queen]) + ')');
-          if Board[VarX[Queen]][VarY[Queen]] = 0 then
-          begin
-            Setlength(BArray, Length(BArray) + 1);
-            index := High(BArray);
-            Copy2DIntArr(Board, BArray[index]);
-            BArray[index][VarX[Queen]][VarY[Queen]] := 1;
-            ColumnRowCheck(BArray[index]);
-            DiagonalCheck(BArray[index]);
-            //Writeln(ToStr(BArray[index]));
-            //Writeln(tostr(index));
-          end;
-        end;
+      for x := 0 to 63 do
+      if Board[x] = 0 then
+      begin
+        Setlength(BArray, Length(BArray) + 1);
+        index := High(BArray);
+        CopyIntArr(Board, BArray[index]);
+        BArray[index][x] := 1;
+        ColumnRowCheck(BArray[index]);
+        DiagonalCheck(BArray[index]);
+      end;
       Writeln(ToStr(GetSystemTime - Timer) + 'ms');
     end;
 
@@ -243,32 +175,41 @@ begin
     begin
       Writeln('Queen ' + ToStr(Queen));
       for I := 0 to High(BArray) do
-        for VarX[Queen] := 0 to 7 do
-          for VarY[Queen] := 0 to 7 do
-          begin
-            //Writeln('(' + tostr(VarX[Queen]) + ',' + tostr(VarY[Queen]) + ')');
-            if BArray[I][VarX[Queen]][VarY[Queen]] = 0 then
-            begin
-              Setlength(B2DArray, Length(B2DArray) + 1);
-              Index := High(B2DArray);
-              Copy3DIntArr(BArray, B2DArray[Index]);
-              B2DArray[Index][I][VarX[Queen]][VarY[Queen]] := 1;
-              ColumnRowCheck(B2DArray[Index][I]);
-              DiagonalCheck(B2DArray[Index][I]);
-              //Writeln(ToStr(BArray[index]));
-              //Writeln(tostr(index));
-            end;
-          end;
-    //Writeln(tostr(B2DArray));
+        for x := 0 to 63 do
+        if BArray[I][x] = 0 then
+        begin
+          Setlength(B2DArray, Length(B2DArray) + 1);
+          Index := High(B2DArray);
+          Copy2DIntArr(BArray, B2DArray[Index]);
+          B2DArray[Index][I][x] := 1;
+          ColumnRowCheck(B2DArray[Index][I]);
+          DiagonalCheck(B2DArray[Index][I]);
+        end;
+      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
     end;
-    //Writeln(ToStr(BoardA));
+
+    3:
+    begin
+      Writeln('Queen ' + ToStr(Queen));
+      for I2 := 0 to High(B2DArray) do
+        for I := 0 to High(B2DArray[I]) do
+          for x := 0 to 63 do
+          if B2DArray[I2][I][x] = 0 then
+          begin
+            Setlength(B3DArray, Length(B3DArray) + 1);
+            Index := High(B3DArray);
+            Copy3DIntArr(B2DArray, B3DArray[Index]);
+            B3DArray[Index][I2][I][x] := 1;
+            ColumnRowCheck(B3DArray[Index][I2][I]);
+            DiagonalCheck(B3DArray[Index][I2][I]);
+          end;
+      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+    end;
   end;
 end;
 
 begin
   ClearDebug;
   Timer := GetSystemTime;
-  FullBoard;
   Main;
-  Writeln(ToStr(GetSystemTime - Timer) + 'ms');
 end.
