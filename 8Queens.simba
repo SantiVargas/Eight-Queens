@@ -173,6 +173,7 @@ begin
 
     2:
     begin
+      SetLength(Board,0);
       Writeln('Queen ' + ToStr(Queen));
       for I := 0 to High(BArray) do
         for x := 0 to 63 do
@@ -190,8 +191,10 @@ begin
 
     3:
     begin
+      SetLength(BArray,0);
       Writeln('Queen ' + ToStr(Queen));
       for I2 := 0 to High(B2DArray) do
+      begin
         for I := 0 to High(B2DArray[I]) do
           for x := 0 to 63 do
           if B2DArray[I2][I][x] = 0 then
@@ -203,6 +206,8 @@ begin
             ColumnRowCheck(B3DArray[Index][I2][I]);
             DiagonalCheck(B3DArray[Index][I2][I]);
           end;
+        SetLength(B2DArray[I2],0);
+      end;
       Writeln(ToStr(GetSystemTime - Timer) + 'ms');
     end;
   end;
