@@ -1,99 +1,143 @@
 program Queens;
 
+//{$DEFINE Lape}
+
 Type
+  {$IFDEF SIMBA}
   T3DIntegerArray = Array of T2DIntegerArray;
+  {$ELSE}
+  {$ENDIF}
   T4DIntegerArray = Array of T3DIntegerArray;
 
 var
   Timer: Integer;
 
-Procedure ColumnRowCheck(var TheBoard: TIntegerArray);
+Procedure RemovePosInArr(Position: Integer; var Arr: TIntegerArray);
 
 var
-  x, i: integer;
+  TmpArr: TIntegerArray;
+  I: Integer;
 
 begin
-  for x := 0 to 63 do
-  if TheBoard[x] = 1 then
-  begin
-    i := x;
-
-    // Check Row Up
-    repeat
-      Inc(I);
-      if I < 64 then
-        TheBoard[i] := -1;
-    until (I >= 64) or ((I mod 8) = 7);
-
-    i := x;
-
-    // Check Row Down
-    repeat
-      Dec(I);
-      if I > -1 then
-        TheBoard[i] := -1;
-    until (I <= 0) or ((I mod 8) = 0);
-
-    i := x;
-
-    //Check Column
-    while (i > 7) do
-      DecEx(I, 8);
-
-    while I < 64 do
+  TmpArr := [];
+  for I := 0 to High(Arr) do
+    if I <> Position then
     begin
-      if (I <> x) then
-        TheBoard[i] := -1;
-      IncEx(I, 8);
+      SetLength(TmpArr, Length(TmpArr) + 1);
+      TmpArr[High(TmpArr)] := Arr[I];
     end;
-  end;
+
+  Arr := TmpArr;
 end;
 
-Procedure DiagonalCheck(var TheBoard: TIntegerArray);
+Procedure RemoveValInArr(Value: Integer; var A: TIntegerArray);
 
 var
-  x, i: integer;
+  I: Integer;
 
 begin
-  for x := 0 to 63 do
-  if TheBoard[x] = 1 then
-  begin
-    i := x;
-
-    // Up, Right
-    repeat
-      IncEx(I, 9);
-      if I < 64 then
-        TheBoard[i] := -1;
-    until (I >= 64) or ((I mod 8) = 7);
-
-    i := x;
-
-    // Down, Left
-    repeat
-      DecEx(I, 9);
-      if I > -1 then
-        TheBoard[i] := -1;
-    until (I <= 0) or ((I mod 8) = 0);
-
-    i := x;
-
-    // Up, Left
-    while (not ((I mod 8) = 0)) and (I < 64) do
+  for I := 0 to High(A) do
+    if A[I] = Value then
     begin
-      IncEx(I, 7);
-      if I < 63 then
-        TheBoard[i] := -1;
+      RemovePosInArr(I, A);
+      I := I - 1;
+    end;
+end;
+
+Function BCheck(TheBoard: TIntegerArray): TIntegerArray;
+
+var
+  Queen, I: integer;
+
+begin
+  {$IFDEF Lape}
+  Result := [0..63];
+  {$ELSE}
+  SetLength(Result, 64);
+  for I := 0 to High(Result) do
+    Result[I] := I;
+  {$ENDIF}
+  for Queen := 0 to High(TheBoard) do
+  begin
+
+    {Row}
+
+    I := TheBoard[Queen];
+    Inc(I);
+
+    // Right
+    while (I < 64) and ((I mod 8) <> 0) do
+    begin
+      RemoveValInArr(I, Result);
+      Inc(I);
     end;
 
-    i := x;
+    I := TheBoard[Queen];
+    Dec(I);
+
+    // Left
+    while (I >= 0) and ((I mod 8) <> 7) do
+    begin
+      RemoveValInArr(I, Result);
+      Dec(I);
+    end;
+
+    {Column}
+
+    I := TheBoard[Queen];
+
+    while (I > 7) do
+      {$IFDEF Lape}
+      I =- 8;
+      {$ELSE}
+      I := I - 8;
+      {$ENDIF}
+
+
+    while (I < 64) do
+    begin
+      if I <> TheBoard[Queen] then
+        RemoveValInArr(I, Result);
+      IncEx(I, 8);
+    end;
+
+    {Diagonal}
+
+    I := TheBoard[Queen];
+
+    // Up, Right
+    while (I < 64) and ((I = 0) xor ((I mod 8) <> 0)) do
+    begin
+      IncEx(I, 9);
+      RemoveValInArr(I, Result);
+    end;
+
+    I := TheBoard[Queen];
+
+    // Down, Left
+    while (I > 0) and ((I mod 8) <> 7) do
+    begin
+      DecEx(I, 9);
+      RemoveValInArr(I, Result);
+    end;
+
+    I := TheBoard[Queen];
+
+    // Up, Left
+    while (I < 64) and ((I mod 8) <> 7) do
+    begin
+      IncEx(I, 7);
+      RemoveValInArr(I, Result);
+    end;
+
+    I := TheBoard[Queen];
 
     // Down, Right
-    repeat
-      DecEx(I, 9);
-      if I > -1 then
-        TheBoard[i] := -1;
-    until (I <= 0) or ((I mod 8) = 7);
+    while (I > 0) and ((I mod 8) <> 7) do
+    begin
+      DecEx(I, 7);
+      RemoveValInArr(I, Result);
+    end;
   end;
 end;
 
@@ -133,26 +177,26 @@ end;
 Procedure Main;
 
 var
-  Board: TIntegerArray;
+  Board, Bad: TIntegerArray;
   BArray: T2DIntegerArray;
   B2DArray: T3DIntegerArray;
   B3DArray: T4DIntegerArray;
   Index, Queen, X, I, I2: integer;
 
 begin
-  for Queen := 0 to 3 do
+  for Queen := 0 to 0 do
   case Queen of
     0:
     begin
       Writeln('Queen ' + ToStr(Queen));
-      for x := 0 to 0 do //Only working on (0,0) for now.
+      for x := 0 to 0 do //Only working on [0] for now.  0 to 7
       begin
-        SetLength(Board, 64);
-        Board[x] := 1;
-        ColumnRowCheck(Board);
-        DiagonalCheck(Board);
+        SetLength(Board, 1);
+        Board[Queen] := 30;
+        Bad := BCheck(Board);
+        Writeln(Bad);
       end;
-      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+      Writeln(ToStr(GetTickCount - Timer) + 'ms');
     end;
 
     1:
@@ -165,15 +209,15 @@ begin
         index := High(BArray);
         CopyIntArr(Board, BArray[index]);
         BArray[index][x] := 1;
-        ColumnRowCheck(BArray[index]);
-        DiagonalCheck(BArray[index]);
+        //ColumnRowCheck(BArray[index]);
+        //DiagonalCheck(BArray[index]);
       end;
-      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+      Writeln(ToStr(GetTickCount - Timer) + 'ms');
     end;
 
     2:
     begin
-      SetLength(Board,0);
+      //SetLength(Board,0);
       Writeln('Queen ' + ToStr(Queen));
       for I := 0 to High(BArray) do
         for x := 0 to 63 do
@@ -183,15 +227,15 @@ begin
           Index := High(B2DArray);
           Copy2DIntArr(BArray, B2DArray[Index]);
           B2DArray[Index][I][x] := 1;
-          ColumnRowCheck(B2DArray[Index][I]);
-          DiagonalCheck(B2DArray[Index][I]);
+          //ColumnRowCheck(B2DArray[Index][I]);
+          //DiagonalCheck(B2DArray[Index][I]);
         end;
-      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+      Writeln(ToStr(GetTickCount - Timer) + 'ms');
     end;
 
     3:
     begin
-      SetLength(BArray,0);
+      //SetLength(BArray,0);
       Writeln('Queen ' + ToStr(Queen));
       for I2 := 0 to High(B2DArray) do
       begin
@@ -203,18 +247,18 @@ begin
             Index := High(B3DArray);
             Copy3DIntArr(B2DArray, B3DArray[Index]);
             B3DArray[Index][I2][I][x] := 1;
-            ColumnRowCheck(B3DArray[Index][I2][I]);
-            DiagonalCheck(B3DArray[Index][I2][I]);
+            //ColumnRowCheck(B3DArray[Index][I2][I]);
+            //DiagonalCheck(B3DArray[Index][I2][I]);
           end;
         SetLength(B2DArray[I2],0);
       end;
-      Writeln(ToStr(GetSystemTime - Timer) + 'ms');
+      Writeln(ToStr(GetTickCount - Timer) + 'ms');
     end;
   end;
 end;
 
 begin
-  ClearDebug;
-  Timer := GetSystemTime;
+  //ClearDebug;
+  Timer := GetTickCount;
   Main;
 end.
