@@ -3,15 +3,15 @@ This project is titled Eight Queens.
 More information about the general concept can be found here: 
 ---http://en.wikipedia.org/wiki/Eight_queens_puzzle
 
-In order to open this type of file, you would need the open source program, SIMBA, which acts as the compiler.
+The file is written in the Free Pascal dialect. This file can be run with the interpreter Pascalscript and Lape, which ship with the program SIMBA.
 
-It can be found here:
+SIMBA can be found here:
 ---http://wizzup.org/#simba
 The source:
 ---https://github.com/MerlijnWajer/Simba
 
-The language this file is written in is called PascalScript.
 
 Credits:
 Thanks to Dgby714 --- He suggested the CopyArray Functions due to problem in PascalScript with pointers and arrays.
+Thanks to those who have worked on SIMBA, Pascalscript, and Lape.
 
