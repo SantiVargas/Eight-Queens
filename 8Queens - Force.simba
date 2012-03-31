@@ -1,0 +1,231 @@
+program Queens;
+
+//{$DEFINE Lape}
+
+Type
+  {$IFDEF SIMBA}
+  T3DIntegerArray = Array of T2DIntegerArray;
+  {$ENDIF}
+  T4DIntegerArray = Array of T3DIntegerArray;
+
+var
+  Timer: Integer;
+
+Procedure RemovePosInArr(Position: Integer; var Arr: TIntegerArray);
+
+var
+  TmpArr: TIntegerArray;
+  I: Integer;
+
+begin
+  TmpArr := [];
+  for I := 0 to High(Arr) do
+    if I <> Position then
+    begin
+      SetLength(TmpArr, Length(TmpArr) + 1);
+      TmpArr[High(TmpArr)] := Arr[I];
+    end;
+
+  Arr := TmpArr;
+end;
+
+Function BCheck(TheBoard: TIntegerArray): Boolean;
+
+var
+  Queen, I: integer;
+
+begin
+  Result := True;
+  Queen := 0;
+  while (Length(TheBoard) <> 0) do
+  //for Queen := 0 to (High(TheBoard) - 1) do
+  begin
+
+    {Row}
+
+    I := TheBoard[Queen];
+    I := I + 1;
+
+    // Right
+    while (I < 64) and ((I mod 8) <> 0) do
+    begin
+      if InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+      I := I + 1;
+    end;
+
+    I := TheBoard[Queen];
+    I := I - 1;
+
+    // Left
+    while (I >= 0) and ((I mod 8) <> 7) do
+    begin
+      if InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+      I := I - 1;
+    end;
+
+    {Column}
+
+    I := TheBoard[Queen];
+
+    while (I > 7) do
+      {$IFDEF Lape}
+      I =- 8;
+      {$ELSE}
+      I := I - 8;
+      {$ENDIF}
+
+
+    while (I < 64) do
+    begin
+      if (I <> TheBoard[Queen]) and InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+      I := I + 8;
+    end;
+
+    {Diagonal}
+
+    I := TheBoard[Queen];
+
+    // Up, Right
+    while (I < 64) and ((I = 0) xor ((I mod 8) <> 0)) do
+    begin
+      I := I + 9;
+      if InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+    end;
+
+    I := TheBoard[Queen];
+
+    // Down, Left
+    while (I > 0) and ((I mod 8) <> 7) do
+    begin
+      I := I - 9;
+      if InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+    end;
+
+    I := TheBoard[Queen];
+
+    // Up, Left
+    while (I < 64) and ((I mod 8) <> 7) do
+    begin
+      I := I + 7;
+      if InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+    end;
+
+    I := TheBoard[Queen];
+
+    // Down, Right
+    while (I > 0) and ((I mod 8) <> 7) do
+    begin
+      I := I - 7;
+      if InIntArray(TheBoard, I) then
+      begin
+        Result := False;
+        Exit;
+      end;
+    end;
+
+    RemovePosInArr(Queen, TheBoard);
+  end;
+end;
+
+Procedure Main;
+
+var
+  Board: TIntegerArray;
+  BArray: T2DIntegerArray;
+  Queen, I, I2, I3, I4, I5, I6, I7, I8: integer;
+
+begin
+  Queen := 0;
+  for I := 0 to 63 do
+  begin
+    Writeln('I: ' + ToStr(I));
+    for I2 := 0 to 63 do
+      if (I2 <> I) then
+      begin
+        Writeln('I2: ' + ToStr(I2));
+        SetLength(Board, 2);
+        Board := [I, I2];
+        if BCheck(Board) then
+          for I3 := 0 to 63 do
+            if (I3 <> I2) and (I3 <> I) then
+            begin
+              SetLength(Board, 3);
+              Board := [I, I2, I3];
+              if BCheck(Board) then
+                for I4 := 0 to 63 do
+                  if (I4 <> I3) and (I4 <> I2) and (I4 <> I) then
+                  begin
+                    SetLength(Board, 4);
+                    Board := [I, I2, I3, I4];
+                    if BCheck(Board) then
+                      for I5 := 0 to 63 do
+                        if (I5 <> I4) and (I5 <> I3) and (I5 <> I2) and (I5 <> I) then
+                        begin
+                          SetLength(Board, 5);
+                          Board := [I, I2, I3, I4, I5];
+                          if BCheck(Board) then
+                            for I6 := 0 to 63 do
+                              if (I6 <> I5) and (I6 <> I4) and (I6 <> I3) and (I6 <> I2) and (I6 <> I) then
+                              begin
+                                SetLength(Board, 6);
+                                Board := [I, I2, I3, I4, I5, I6];
+                                if BCheck(Board) then
+                                  for I7 := 0 to 63 do
+                                    if (I7 <> I6) and (I7 <> I5) and (I7 <> I4) and (I7 <> I3) and (I7 <> I2) and (I7 <> I) then
+                                    begin
+                                      SetLength(Board, 7);
+                                      Board := [I, I2, I3, I4, I5, I6, I7];
+                                      if BCheck(Board) then
+                                        for I8 := 0 to 63 do
+                                          if (I8 <> I7) and (I8 <> I6) and (I8 <> I5) and (I8 <> I4) and (I8 <> I3) and (I8 <> I2) and (I8 <> I) then
+                                          begin
+                                            SetLength(Board, 8);
+                                            Board := [I, I2, I3, I4, I5, I6, I7, I8];
+                                            if BCheck(Board) then
+                                            begin
+                                              Writeln(Board);
+                                              Writeln(ToStr(GetTickCount - Timer) + 'ms');
+                                              SetLength(BArray, Length(BArray) + 1);
+                                              BArray[High(BArray)] := Board;
+                                            end;
+                                          end;
+                                    end;
+                              end;
+                        end;
+                  end;
+            end;
+      end;
+  end;
+  Writeln(BArray);
+  Writeln('Time Taken: ' + ToStr(GetTickCount - Timer) + 'ms');
+end;
+
+begin
+  ClearDebug;
+  Timer := GetTickCount;
+  Main;
+end.
