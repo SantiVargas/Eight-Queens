@@ -38,7 +38,6 @@ begin
   Result := True;
   Queen := 0;
   while (Length(TheBoard) <> 0) do
-  //for Queen := 0 to (High(TheBoard) - 1) do
   begin
 
     {Row}
@@ -160,66 +159,57 @@ var
 
 begin
   Queen := 0;
-  for I := 0 to 63 do
+  for I := 0 to 7 do
   begin
     Writeln('I: ' + ToStr(I));
-    for I2 := 0 to 63 do
-      if (I2 <> I) then
-      begin
-        Writeln('I2: ' + ToStr(I2));
-        SetLength(Board, 2);
-        Board := [I, I2];
-        if BCheck(Board) then
-          for I3 := 0 to 63 do
-            if (I3 <> I2) and (I3 <> I) then
+    for I2 := 8 to 15 do
+    begin
+      SetLength(Board, 2);
+      Board := [I, I2];
+      if BCheck(Board) then
+        for I3 := 16 to 23 do
+        begin
+          SetLength(Board, 3);
+          Board := [I, I2, I3];
+          if BCheck(Board) then
+            for I4 := 24 to 31 do
             begin
-              SetLength(Board, 3);
-              Board := [I, I2, I3];
+              SetLength(Board, 4);
+              Board := [I, I2, I3, I4];
               if BCheck(Board) then
-                for I4 := 0 to 63 do
-                  if (I4 <> I3) and (I4 <> I2) and (I4 <> I) then
-                  begin
-                    SetLength(Board, 4);
-                    Board := [I, I2, I3, I4];
-                    if BCheck(Board) then
-                      for I5 := 0 to 63 do
-                        if (I5 <> I4) and (I5 <> I3) and (I5 <> I2) and (I5 <> I) then
+                for I5 := 32 to 39 do
+                begin
+                  SetLength(Board, 5);
+                  Board := [I, I2, I3, I4, I5];
+                  if BCheck(Board) then
+                    for I6 := 40 to 47 do
+                    begin
+                      SetLength(Board, 6);
+                      Board := [I, I2, I3, I4, I5, I6];
+                      if BCheck(Board) then
+                        for I7 := 48 to 55 do
                         begin
-                          SetLength(Board, 5);
-                          Board := [I, I2, I3, I4, I5];
+                          SetLength(Board, 7);
+                          Board := [I, I2, I3, I4, I5, I6, I7];
                           if BCheck(Board) then
-                            for I6 := 0 to 63 do
-                              if (I6 <> I5) and (I6 <> I4) and (I6 <> I3) and (I6 <> I2) and (I6 <> I) then
+                            for I8 := 56 to 63 do
+                            begin
+                              SetLength(Board, 8);
+                              Board := [I, I2, I3, I4, I5, I6, I7, I8];
+                              if BCheck(Board) then
                               begin
-                                SetLength(Board, 6);
-                                Board := [I, I2, I3, I4, I5, I6];
-                                if BCheck(Board) then
-                                  for I7 := 0 to 63 do
-                                    if (I7 <> I6) and (I7 <> I5) and (I7 <> I4) and (I7 <> I3) and (I7 <> I2) and (I7 <> I) then
-                                    begin
-                                      SetLength(Board, 7);
-                                      Board := [I, I2, I3, I4, I5, I6, I7];
-                                      if BCheck(Board) then
-                                        for I8 := 0 to 63 do
-                                          if (I8 <> I7) and (I8 <> I6) and (I8 <> I5) and (I8 <> I4) and (I8 <> I3) and (I8 <> I2) and (I8 <> I) then
-                                          begin
-                                            SetLength(Board, 8);
-                                            Board := [I, I2, I3, I4, I5, I6, I7, I8];
-                                            if BCheck(Board) then
-                                            begin
-                                              Writeln(Board);
-                                              Writeln(ToStr(GetTickCount - Timer) + 'ms');
-                                              SetLength(BArray, Length(BArray) + 1);
-                                              BArray[High(BArray)] := Board;
-                                            end;
-                                          end;
-                                    end;
+                                SetLength(BArray, Length(BArray) + 1);
+                                BArray[High(BArray)] := Board;
                               end;
+                            end;
                         end;
-                  end;
+                    end;
+                end;
             end;
-      end;
+        end;
+    end;
   end;
+  Writeln('Number of Solutions: ' + ToStr(Length(BArray)));
   Writeln(BArray);
   Writeln('Time Taken: ' + ToStr(GetTickCount - Timer) + 'ms');
 end;
