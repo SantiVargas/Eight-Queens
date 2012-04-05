@@ -97,7 +97,7 @@ begin
     I := TheBoard[Queen];
 
     // Up, Right
-    while (I < 64) and ((I = 0) xor ((I mod 8) <> 0)) do
+    while (I < 55) and ((I mod 8) <> 7) do
     begin
       I := I + 9;
       if InIntArray(TheBoard, I) then
@@ -109,36 +109,10 @@ begin
 
     I := TheBoard[Queen];
 
-    // Down, Left
-    while (I > 0) and ((I mod 8) <> 7) do
-    begin
-      I := I - 9;
-      if InIntArray(TheBoard, I) then
-      begin
-        Result := False;
-        Exit;
-      end;
-    end;
-
-    I := TheBoard[Queen];
-
     // Up, Left
-    while (I < 64) and ((I mod 8) <> 7) do
+    while (I < 56) and ((I mod 8) <> 0) do
     begin
       I := I + 7;
-      if InIntArray(TheBoard, I) then
-      begin
-        Result := False;
-        Exit;
-      end;
-    end;
-
-    I := TheBoard[Queen];
-
-    // Down, Right
-    while (I > 0) and ((I mod 8) <> 7) do
-    begin
-      I := I - 7;
       if InIntArray(TheBoard, I) then
       begin
         Result := False;
@@ -210,7 +184,8 @@ begin
     end;
   end;
   Writeln('Number of Solutions: ' + ToStr(Length(BArray)));
-  Writeln(BArray);
+  for I := 0 to High(BArray) do
+    Writeln(ToStr(I) + ': ' + ToStr(BArray[I]));
   Writeln('Time Taken: ' + ToStr(GetTickCount - Timer) + 'ms');
 end;
 
