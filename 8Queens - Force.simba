@@ -37,7 +37,7 @@ var
 begin
   Result := True;
   Queen := 0;
-  while (Length(TheBoard) <> 0) do
+  while (Length(TheBoard) > 1) do
   begin
 
     {Row}

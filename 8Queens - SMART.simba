@@ -1,11 +1,7 @@
 program Queens;
 
-//{$DEFINE Lape}
-
 Type
-  {$IFDEF SIMBA}
   T3DIntegerArray = Array of T2DIntegerArray;
-  {$ENDIF}
   T4DIntegerArray = Array of T3DIntegerArray;
 
 var
@@ -37,52 +33,17 @@ var
 begin
   Result := True;
   Queen := 0;
-  while (Length(TheBoard) <> 0) do
+  while (Length(TheBoard) > 1) do
   begin
-
-    {Row}
-
-    I := TheBoard[Queen];
-    I := I + 1;
-
-    // Right
-    while (I < 64) and ((I mod 8) <> 0) do
-    begin
-      if InIntArray(TheBoard, I) then
-      begin
-        Result := False;
-        Exit;
-      end;
-      I := I + 1;
-    end;
-
-    I := TheBoard[Queen];
-    I := I - 1;
-
-    // Left
-    while (I >= 0) and ((I mod 8) <> 7) do
-    begin
-      if InIntArray(TheBoard, I) then
-      begin
-        Result := False;
-        Exit;
-      end;
-      I := I - 1;
-    end;
 
     {Column}
 
     I := TheBoard[Queen];
 
     while (I > 7) do
-      {$IFDEF Lape}
-      I =- 8;
-      {$ELSE}
       I := I - 8;
-      {$ENDIF}
 
-
-    while (I < 64) do
+   while (I < 64) do
     begin
       if (I <> TheBoard[Queen]) and InIntArray(TheBoard, I) then
       begin
@@ -129,63 +90,46 @@ Procedure Main;
 var
   Board: TIntegerArray;
   BArray: T2DIntegerArray;
-  Queen, I, I2, I3, I4, I5, I6, I7, I8: integer;
+  X, Y, NewI, I4, Position: integer;
 
 begin
-  Queen := 0;
-  for I := 0 to 7 do
-  begin
-    Writeln('I: ' + ToStr(I));
-    for I2 := 8 to 15 do
+  NewI := 0;
+  I4 := 0;
+  repeat
+    for X := NewI to 7 do
     begin
-      SetLength(Board, 2);
-      Board := [I, I2];
-      if BCheck(Board) then
-        for I3 := 16 to 23 do
-        begin
-          SetLength(Board, 3);
-          Board := [I, I2, I3];
-          if BCheck(Board) then
-            for I4 := 24 to 31 do
-            begin
-              SetLength(Board, 4);
-              Board := [I, I2, I3, I4];
-              if BCheck(Board) then
-                for I5 := 32 to 39 do
-                begin
-                  SetLength(Board, 5);
-                  Board := [I, I2, I3, I4, I5];
-                  if BCheck(Board) then
-                    for I6 := 40 to 47 do
-                    begin
-                      SetLength(Board, 6);
-                      Board := [I, I2, I3, I4, I5, I6];
-                      if BCheck(Board) then
-                        for I7 := 48 to 55 do
-                        begin
-                          SetLength(Board, 7);
-                          Board := [I, I2, I3, I4, I5, I6, I7];
-                          if BCheck(Board) then
-                            for I8 := 56 to 63 do
-                            begin
-                              SetLength(Board, 8);
-                              Board := [I, I2, I3, I4, I5, I6, I7, I8];
-                              if BCheck(Board) then
-                              begin
-                                SetLength(BArray, Length(BArray) + 1);
-                                BArray[High(BArray)] := Board;
-                              end;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
+      for Y := I4 to 7 do
+      begin
+        if I4 <> 0 then
+          I4 := 0;
+        SetLength(Board, X + 1);
+        Board[X] := (X * 8) + Y;
+        if BCheck(Board) then
+         Break;
+      end;
+      if Y = 8 then
+        Break;
     end;
-  end;
+    if X = 8 then
+    begin
+      SetLength(BArray, Length(BArray) + 1);
+      BArray[High(BArray)] := Board;
+      Writeln('I: ' + ToStr(High(Barray)));
+      Y := 8;
+    end;
+    if Y = 8 then
+    begin
+      NewI := X - 1;//pos that doesnt work
+      if NewI < 0 then Break;
+      I4 := Board[newi] - (newi * 8) + 1;//sub location that doesnt work
+      for Position := High(Board) downto NewI do
+        RemovePosInArr(Position, Board);
+    end else
+      I4 := 0;
+  until False;
   Writeln('Number of Solutions: ' + ToStr(Length(BArray)));
-  for I := 0 to High(BArray) do
-    Writeln(ToStr(I) + ': ' + ToStr(BArray[I]));
+  for X := 0 to High(BArray) do
+    Writeln(ToStr(X) + ': ' + ToStr(BArray[X]));
   Writeln('Time Taken: ' + ToStr(GetTickCount - Timer) + 'ms');
 end;
 
