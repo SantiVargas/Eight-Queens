@@ -1,0 +1,104 @@
+program Queens;
+
+var
+  Timer: Integer;
+
+Procedure RemovePosInArr(var Arr: TIntegerArray; Position: Integer);
+
+var
+  TmpArr: TIntegerArray;
+  I: Integer;
+
+begin
+  for I := 0 to High(Arr) do
+    if I <> Position then
+    begin
+      SetLength(TmpArr, Length(TmpArr) + 1);
+      TmpArr[High(TmpArr)] := Arr[I];
+    end;
+
+  Arr := TmpArr;
+end;
+
+Function BoardCheck(TheBoard: TIntegerArray): Boolean;
+
+var
+  I: integer;
+
+begin
+  {Column}
+  while (Length(TheBoard) > 1) do
+  begin
+    for I := High(TheBoard) downto 1 do
+      if TheBoard[0] = TheBoard[I] then
+        Exit;
+
+  {Diagonal}
+    for I := High(TheBoard) downto 1 do
+      if I = Abs(TheBoard[I] - TheBoard[0]) then
+        Exit;
+
+    RemovePosInArr(TheBoard, 0);
+  end;
+
+  Result := True;
+end;
+
+Procedure MainLoop;
+
+var
+  Board: TIntegerArray;
+  BArray: T2DIntegerArray;
+  X, Y, Position, Time: integer;
+
+begin
+  while (X > -1) do
+  begin
+    for X := X to 7 do
+    begin
+      SetLength(Board, X + 1);
+      for Y := Y to 7 do
+      begin
+        Board[X] := Y;
+        if BoardCheck(Board) then
+        begin
+          Y := 0;
+          Break;
+        end;
+      end;
+      if Y = 8 then
+        Break;
+    end;
+
+    //Good Answer
+    if X = 8 then
+    begin
+      SetLength(BArray, Length(BArray) + 1);
+      BArray[High(BArray)] := Board;
+      //Writeln('I: ' + ToStr(High(Barray)));
+      Y := 8;
+    end;
+
+    //Bad Answer
+    if Y = 8 then
+    begin
+      X := X - 1; //pos that doesnt work
+      Y := Board[X] + 1;//sub location that doesnt work
+      for Position := High(Board) downto X do
+        RemovePosInArr(Board, Position);
+    end else
+      Y := 0;
+  end;
+
+  Time := GetTickCount - Timer;
+  Writeln('Number of Solutions: ' + ToStr(Length(BArray)));
+  for X := 0 to High(BArray) do
+    Writeln(ToStr(X) + ': ' + ToStr(BArray[X]));
+  Writeln('Time Taken: ' + ToStr(Time) + 'ms');
+end;
+
+begin
+  ClearDebug;
+  Timer := GetTickCount;
+  MainLoop;
+end.

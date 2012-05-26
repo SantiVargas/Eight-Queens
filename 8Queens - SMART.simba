@@ -1,20 +1,15 @@
 program Queens;
 
-Type
-  T3DIntegerArray = Array of T2DIntegerArray;
-  T4DIntegerArray = Array of T3DIntegerArray;
-
 var
   Timer: Integer;
 
-Procedure RemovePosInArr(Position: Integer; var Arr: TIntegerArray);
+Function RemovePosInArr(Position: Integer; Arr: TIntegerArray): TIntegerArray;
 
 var
   TmpArr: TIntegerArray;
   I: Integer;
 
 begin
-  TmpArr := [];
   for I := 0 to High(Arr) do
     if I <> Position then
     begin
@@ -22,30 +17,28 @@ begin
       TmpArr[High(TmpArr)] := Arr[I];
     end;
 
-  Arr := TmpArr;
+  Result := TmpArr;
 end;
 
 Function BCheck(TheBoard: TIntegerArray): Boolean;
 
 var
-  Queen, I: integer;
+  I: integer;
 
 begin
-  Result := True;
-  Queen := 0;
   while (Length(TheBoard) > 1) do
   begin
 
     {Column}
 
-    I := TheBoard[Queen];
+    I := TheBoard[0];
 
     while (I > 7) do
       I := I - 8;
 
-   while (I < 64) do
+    while (I < 64) do
     begin
-      if (I <> TheBoard[Queen]) and InIntArray(TheBoard, I) then
+      if (I <> TheBoard[0]) and InIntArray(TheBoard, I) then
       begin
         Result := False;
         Exit;
@@ -55,7 +48,7 @@ begin
 
     {Diagonal}
 
-    I := TheBoard[Queen];
+    I := TheBoard[0];
 
     // Up, Right
     while (I < 55) and ((I mod 8) <> 7) do
@@ -68,7 +61,7 @@ begin
       end;
     end;
 
-    I := TheBoard[Queen];
+    I := TheBoard[0];
 
     // Up, Left
     while (I < 56) and ((I mod 8) <> 0) do
@@ -81,8 +74,9 @@ begin
       end;
     end;
 
-    RemovePosInArr(Queen, TheBoard);
+    TheBoard := RemovePosInArr(0, TheBoard);
   end;
+  Result := True;
 end;
 
 Procedure Main;
@@ -90,7 +84,7 @@ Procedure Main;
 var
   Board: TIntegerArray;
   BArray: T2DIntegerArray;
-  X, Y, NewI, I4, Position: integer;
+  X, Y, NewI, I4, Position, Time: integer;
 
 begin
   NewI := 0;
@@ -100,12 +94,11 @@ begin
     begin
       for Y := I4 to 7 do
       begin
-        if I4 <> 0 then
-          I4 := 0;
+        I4 := 0;
         SetLength(Board, X + 1);
         Board[X] := (X * 8) + Y;
         if BCheck(Board) then
-         Break;
+          Break;
       end;
       if Y = 8 then
         Break;
@@ -114,7 +107,7 @@ begin
     begin
       SetLength(BArray, Length(BArray) + 1);
       BArray[High(BArray)] := Board;
-      Writeln('I: ' + ToStr(High(Barray)));
+      //Writeln('I: ' + ToStr(High(Barray)));
       Y := 8;
     end;
     if Y = 8 then
@@ -123,14 +116,15 @@ begin
       if NewI < 0 then Break;
       I4 := Board[newi] - (newi * 8) + 1;//sub location that doesnt work
       for Position := High(Board) downto NewI do
-        RemovePosInArr(Position, Board);
+        Board := RemovePosInArr(Position, Board);
     end else
       I4 := 0;
   until False;
+  Time := GetTickCount - Timer;
   Writeln('Number of Solutions: ' + ToStr(Length(BArray)));
   for X := 0 to High(BArray) do
     Writeln(ToStr(X) + ': ' + ToStr(BArray[X]));
-  Writeln('Time Taken: ' + ToStr(GetTickCount - Timer) + 'ms');
+  Writeln('Time Taken: ' + ToStr(Time) + 'ms');
 end;
 
 begin
